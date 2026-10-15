@@ -49,6 +49,17 @@ Device names come from the system `pci.ids` file when installed, with a built-in
 
 Fields a GPU or driver does not support are left out of the report. Live values (utilization, clocks, power, temperature) are a single sample taken when the tool runs.
 
+## Claude Code plugin
+
+This repository is also a Claude Code plugin marketplace. The `gpuinfo` plugin bundles the MCP server and a `gpuinfo` skill that tells Claude when to call the tools and how to read the report:
+
+```
+/plugin marketplace add xbill9/gpuinfo-rust
+/plugin install gpuinfo@gpuinfo
+```
+
+The plugin starts the server through `plugin/bin/gpuinfo-mcp`, which uses `gpuinfo-rust` from `PATH` if present, otherwise downloads the prebuilt x86_64 Linux binary from the GitHub release (SHA-256 pinned in the script, glibc 2.34+), otherwise builds it with `cargo install`. See [plugin/README.md](plugin/README.md).
+
 ## Getting Started
 
 ### Prerequisites

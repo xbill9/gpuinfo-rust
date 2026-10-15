@@ -1,0 +1,18 @@
+{
+  "name": "gpuinfo",
+  "owner": {
+    "name": "xbill9",
+    "url": "https://github.com/xbill9"
+  },
+  "metadata": {
+    "description": "Detailed GPU information for Claude Code: a skill plus the gpuinfo-rust MCP server.",
+    "version": "0.3.0"
+  },
+  "plugins": [
+    {
+      "name": "gpuinfo",
+      "source": "./plugin",
+      "description": "Report everything about the local GPUs: model, VRAM, driver and CUDA versions, clocks, power, temperatures, throttling, PCIe link, displays and GPU processes. NVIDIA via NVML, any vendor via sysfs. Read-only."
+    }
+  ]
+}

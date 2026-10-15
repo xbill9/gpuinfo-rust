@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Starts the gpuinfo-rust MCP server (or runs it as a CLI when given arguments).
+#
+# Binary lookup, first match wins:
+#   1. $GPUINFO_BIN
+#   2. gpuinfo-rust on PATH
+#   3. cached prebuilt release binary (x86_64 Linux, glibc 2.34+)
+#   4. download that release binary from GitHub, verified against SHA256 below
+#   5. cargo install from the tagged source (needs a Rust toolchain)
+#
+# Stdout belongs to the MCP protocol, so every message here goes to stderr.
+set -euo pipefail
+
+VERSION="0.3.0"
+REPO="xbill9/gpuinfo-rust"
+ASSET="gpuinfo-rust-x86_64-linux-gnu"
+SHA256="009f1121fb87255ea62bb4829f5c0f099b13707ab7ab907f695f09eca4044d3d"
+
+log() { echo "gpuinfo-mcp: $*" >&2; }
+
+if [[ -n "${GPUINFO_BIN:-}" ]]; then
+  exec "$GPUINFO_BIN" "$@"
+fi
+
+if command -v gpuinfo-rust >/dev/null 2>&1; then
+  exec gpuinfo-rust "$@"
+fi
+
+cache="${CLAUDE_PLUGIN_DATA:-${XDG_CACHE_HOME:-$HOME/.cache}/gpuinfo-rust}/v$VERSION"
+bin="$cache/gpuinfo-rust"
+if [[ -x "$bin" ]]; then
+  exec "$bin" "$@"
+fi
+mkdir -p "$cache"
+
+if [[ "$(uname -s)-$(uname -m)" == "Linux-x86_64" ]] && command -v curl >/dev/null 2>&1; then
+  url="https://github.com/$REPO/releases/download/v$VERSION/$ASSET"
+  log "downloading $url"
+  tmp="$(mktemp "$cache/download.XXXXXX")"
+  if curl -fsSL --retry 2 -o "$tmp" "$url" \
+    && echo "$SHA256  $tmp" | sha256sum -c --status - ; then
+    chmod +x "$tmp"
+    if "$tmp" --help >/dev/null 2>&1; then
+      mv "$tmp" "$bin"
+      exec "$bin" "$@"
+    fi
+    log "prebuilt binary does not run here (it needs glibc 2.34 or newer)"
+  else
+    log "download failed or checksum mismatch"
+  fi
+  rm -f "$tmp"
+fi
+
+if command -v cargo >/dev/null 2>&1; then
+  log "building from source with cargo (first start only, takes a few minutes)"
+  cargo install --quiet --locked --git "https://github.com/$REPO" --tag "v$VERSION" --root "$cache/cargo" >&2
+  ln -sf "$cache/cargo/bin/gpuinfo-rust" "$bin"
+  exec "$bin" "$@"
+fi
+
+log "no gpuinfo-rust binary available. Install Rust (https://rustup.rs) and run:"
+log "  cargo install --locked --git https://github.com/$REPO --tag v$VERSION"
+exit 1

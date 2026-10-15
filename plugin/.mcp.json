@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "gpuinfo": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/bin/gpuinfo-mcp"
+    }
+  }
+}

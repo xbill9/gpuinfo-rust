@@ -1,0 +1,13 @@
+{
+  "name": "gpuinfo",
+  "description": "Detailed GPU information from inside Claude Code: model, VRAM, driver and CUDA versions, clocks, power, temperatures, throttle reasons, PCIe link, displays and running GPU processes.",
+  "version": "0.3.0",
+  "author": {
+    "name": "xbill9",
+    "url": "https://github.com/xbill9"
+  },
+  "homepage": "https://github.com/xbill9/gpuinfo-rust",
+  "repository": "https://github.com/xbill9/gpuinfo-rust",
+  "license": "MIT",
+  "keywords": ["gpu", "nvidia", "nvml", "cuda", "amd", "intel", "vram", "hardware", "mcp"]
+}
