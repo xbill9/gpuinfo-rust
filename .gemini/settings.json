@@ -1,0 +1,11 @@
+ {
+    "mcpServers": {
+      "gpuinfo": {
+        "command": "$HOME/gpuinfo-rust/target/release/gpuinfo-rust",
+        "args": [],
+        "env": {
+          "RUST_LOG": "trace"
+        }
+      }
+    }
+  }
